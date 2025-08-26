@@ -7,7 +7,7 @@ output="/data/cgi.csv"
 logfiles=("teapot.log" "deathscreen.log" "style.log")
 
 # Get current timestamp
-timestamp=$(date -d "1 minute ago" +"%F %H:%M")
+timestamp=$(date -u -d "1 minute ago" +"%F %H:%M")
 
 # Initialize array with timestamp
 row=("$timestamp")
