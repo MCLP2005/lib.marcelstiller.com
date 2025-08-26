@@ -5,7 +5,7 @@ set xlabel "Zeit"
 set ylabel "Anzahl an Aufrufen"
 set xdata time
 set timefmt "%Y-%m-%d %H:%M"
-set xrange [system("date -u -d '2 days ago' +'%F 00:00'"):system("date -u +'%F 24:00'")]
+set xrange [system("date -u -d '13 days ago' +'%F 00:00'"):system("date -u +'%F 24:00'")]
 set format x "%Y-%m-%d %H:%M"
 set yrange [0:500]
 set tics textcolor "black"
