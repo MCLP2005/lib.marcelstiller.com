@@ -21,6 +21,6 @@ done
 
 # Output to CSV
 (
-    IFS=;
+    IFS=';'
     echo "${row[*]}"
 ) >> "$output"
