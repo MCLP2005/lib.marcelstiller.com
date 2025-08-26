@@ -9,3 +9,5 @@ while test $i -le 100; do
   echo .h${i} { height: ${i}vh }
   (( ++i ))
 done
+
+echo "$(date +'%F %H:%M') > /data/logs/style.log
