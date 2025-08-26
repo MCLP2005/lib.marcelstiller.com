@@ -16,6 +16,7 @@ row=("$timestamp")
 for logfile in "${logfiles[@]}"; do
     count=$(wc -l < "$logdir/$logfile")
     row+=("$count")
+    rm "$logdir/$logfile"
 done
 
 # Output to CSV
