@@ -7,4 +7,4 @@ echo "<p style='text-align:center;width:98vw;color:white;font-size:4vh'>$(echo $
 
 # Example usage: http://yourserver/cgi/deathscreen.cgi?You_have_died_due_to_a_trap
 
-echo "$(date +'%F %H:%M') > /data/logs/deathscreen.log
+echo "$(date +'%F %H:%M')" > /data/logs/deathscreen.log
