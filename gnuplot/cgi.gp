@@ -7,7 +7,7 @@ set xdata time
 set timefmt "%Y-%m-%d %H:%M"
 set xrange [system("date -u -d '2 days ago' +'%F 00:00'"):system("date -u +'%F 24:00'")]
 set format x "%Y-%m-%d %H:%M"
-set yrange [0:100]
+set yrange [0:500]
 set tics textcolor "black"
 set xtics rotate by 90 right
 set out "/var/www/html/monitoring/graphics/local.svg"
