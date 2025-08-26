@@ -14,7 +14,11 @@ row=("$timestamp")
 
 # Loop through log files and count lines (assuming each line is a timestamp entry)
 for logfile in "${logfiles[@]}"; do
-    count=$(wc -l < "$logdir/$logfile")
+    if test -e $logdir/$logfile; then
+        count=$(wc -l < "$logdir/$logfile")
+    else
+        count=0
+    fi
     row+=("$count")
     rm "$logdir/$logfile"
 done
