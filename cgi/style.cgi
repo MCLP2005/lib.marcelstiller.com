@@ -10,4 +10,4 @@ while test $i -le 100; do
   (( ++i ))
 done
 
-echo "$(date +'%F %H:%M')" > /data/logs/style.log
+echo "$(date +'%F %H:%M')" >> /data/logs/style.log
