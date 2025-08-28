@@ -17,7 +17,9 @@ echo "/* Usage guide
 # .lh{n} sets line-height to n em -> .lh1 sets line-height to 1em
 # .ls-{n} sets letter-spacing to n px -> .ls-1 sets letter-spacing to 1px
 # .text-{n} sets font-size to n px -> .text-1 sets font-size to 1px
-*/"
+*/
+
+"
 
 i=0
 
