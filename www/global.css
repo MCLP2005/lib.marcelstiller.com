@@ -1,0 +1,29 @@
+@import url("/cgi-bin/style.cgi");
+.frame {
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  margin-left: 1vw;
+  margin-right: 1vw;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  padding-right: 1vw;
+  padding-left: 1vw;
+  background-color: lightgray;
+  min-height: 94vh;
+  width: 95vw;
+  border-style: outset;
+  border-width: 5px;
+  border-radius: 50px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+table, tr, th, td {
+  border-style: solid;
+  border-width: 3px;
+  border-radius: 8px;
+  text-align: center;
+}
+
