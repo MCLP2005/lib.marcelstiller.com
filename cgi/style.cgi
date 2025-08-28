@@ -19,6 +19,7 @@ while test $i -le 100; do
   echo .lh${i} { line-height: ${i}em }
   echo .ls-${i} { letter-spacing: ${i}px }
   echo .text-${i} { font-size: ${i}px }
+  echo
   (( ++i ))
 done
 
