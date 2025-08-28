@@ -11,6 +11,6 @@ set yrange [0:500]
 set tics textcolor "black"
 set xtics rotate by 90 right
 set out "/var/www/html/monitoring/graphics/local.svg"
-plot "/data/cgi.csv" using 1:2 with lines lw 7 lc rgb "#008080" title "Easteregg", \
-        "/data/cgi.csv" using 1:3 with lines lw 5 lc rgb "#00ff00" title "deathscreen", \
-        "/data/cgi.csv" using 1:4 with lines lw 3 lc rgb "#0000ff" title "style"
+plot "/data/cgi.csv" using 1:2 with lines lw 10 lc rgb "#008080" title "Easteregg", \
+        "/data/cgi.csv" using 1:3 with lines lw 6 lc rgb "#00ff00" title "deathscreen", \
+        "/data/cgi.csv" using 1:4 with lines lw 2 lc rgb "#0000ff" title "style"
