@@ -92,14 +92,17 @@ API_URL="$OPENAI_BASE_URL/v1/responses"
 REQUEST_JSON=$(jq -n --arg prompt "$PROMPT" '{
   model: "gpt-5-nano",
   input: $prompt,
-  tools: [ {type: "web_search"} ],
-  max_output_tokens: 300
+  tools: [ {type: "web_search"} ]
 }')
 
-RESPONSE_RAW=$(curl -sS "$API_URL" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d "$REQUEST_JSON" || true)
+if [[ -n "${OPENAI_MOCK_RESPONSE:-}" && -f "$OPENAI_MOCK_RESPONSE" ]]; then
+  RESPONSE_RAW=$(cat "$OPENAI_MOCK_RESPONSE")
+else
+  RESPONSE_RAW=$(curl -sS "$API_URL" \
+    -H "Authorization: Bearer $OPENAI_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "$REQUEST_JSON" || true)
+fi
 
 if [[ -z "$RESPONSE_RAW" ]]; then
   echo "Error: Empty response from OpenAI API" >&2
@@ -111,8 +114,55 @@ if echo "$RESPONSE_RAW" | jq -e .error >/dev/null 2>&1; then
   exit 1
 fi
 
+RESP_STATUS=$(echo "$RESPONSE_RAW" | jq -r '.status // empty')
+RESP_ID=$(echo "$RESPONSE_RAW" | jq -r '.id // empty')
+
+if [[ -n "$RESP_STATUS" && "$RESP_STATUS" != "completed" && -n "$RESP_ID" ]]; then
+  START_TS=$(date +%s)
+  TIMEOUT_SECS=180
+  while :; do
+    NOW_TS=$(date +%s)
+    ELAPSED=$((NOW_TS - START_TS))
+    if (( ELAPSED > TIMEOUT_SECS )); then
+      echo "Error: Timed out waiting for response $RESP_ID to complete (last status: $RESP_STATUS)" >&2
+      break
+    fi
+
+    POLL_RAW=$(curl -sS "$API_URL/$RESP_ID" -H "Authorization: Bearer $OPENAI_API_KEY") || true
+    if [[ -z "$POLL_RAW" ]]; then
+      sleep 1
+      continue
+    fi
+
+    if echo "$POLL_RAW" | jq -e .error >/dev/null 2>&1; then
+      echo "Error from API while polling: $(echo "$POLL_RAW" | jq -r .error.message)" >&2
+      break
+    fi
+
+    RESP_STATUS=$(echo "$POLL_RAW" | jq -r '.status // empty')
+    RESPONSE_RAW="$POLL_RAW"
+
+    if [[ "$RESP_STATUS" == "completed" ]]; then
+      break
+    fi
+
+    INCOMPLETE_REASON=$(echo "$POLL_RAW" | jq -r '.incomplete_details.reason // empty')
+    sleep 1
+  done
+fi
+
 AI_TEXT=$(echo "$RESPONSE_RAW" | jq -r '
-  .output_text //
+  (.output_text // empty) //
+  (
+    ( .output // empty ) |
+    if type=="array" then
+      ([ .[]
+         | select(.type=="message")
+         | .content // []
+         | map(select(.type=="output_text") | .text)
+       ] | flatten | join("\n\n"))
+    else empty end
+  ) //
   (.content // empty | if type=="array" then .[0].text // .[0].content // empty else . end) //
   (.choices // empty | if type=="array" then .[0].message.content // .[0].text // empty else . end) //
   empty
@@ -124,7 +174,8 @@ if [[ -z "$AI_TEXT" || "$AI_TEXT" == "null" ]]; then
   exit 1
 fi
 
-AI_TEXT_TRIMMED=$(printf "%s" "$AI_TEXT" | sed 's/[\r\t]\+//g')
+AI_TEXT_TRIMMED=$(printf "%s" "$AI_TEXT" \
+  | sed -e 's/\r//g' -e 's/\t\+//g' -e 's/]]>/]]]]><![CDATA[>/g')
 
 ensure_feed_exists() {
   if [[ -f "$FEED_PATH" ]]; then
@@ -149,10 +200,11 @@ __FEED__
 add_item_to_feed() {
   if grep -q "<title>$TODAY_YMD</title>" "$FEED_PATH" 2>/dev/null; then
     echo "Item for $TODAY_YMD already present; not adding duplicate" >&2
+    ITEM_ADDED=0
     return
   fi
 
-  TMP_FILE=$(mktemp)
+  TMP_FILE=$(mktemp "$FEED_DIR/.daily-haiku.XXXXXXXXXX")
   trap 'rm -f "$TMP_FILE"' EXIT
 
   awk -v now="$RFC2822_NOW" -v title="$TODAY_YMD" -v link="https://stillermarcel.kit.com" -v desc="$AI_TEXT_TRIMMED" '
@@ -162,10 +214,15 @@ add_item_to_feed() {
                     "    <guid isPermaLink=\"false\">" title "</guid>\n" \
                     "    <pubDate>" now "</pubDate>\n" \
                     "    <description><![CDATA[" desc "]]></description>\n" \
-                    "  </item>\n" }
+                    "  </item>\n"; inItem = 0 }
     {
+      if ($0 ~ /<item>/) { inItem = 1 }
+      if ($0 ~ /<\/item>/) { inItem = 0 }
       if ($0 ~ /<lastBuildDate>/) {
         sub(/<lastBuildDate>.*<\/lastBuildDate>/, "<lastBuildDate>" now "</lastBuildDate>")
+      }
+      if (!inItem && $0 ~ /<pubDate>/) {
+        sub(/<pubDate>.*<\/pubDate>/, "<pubDate>" now "</pubDate>")
       }
     }
     /<\/channel>/ {
@@ -176,10 +233,16 @@ add_item_to_feed() {
 
   mv "$TMP_FILE" "$FEED_PATH"
   trap - EXIT
+  ITEM_ADDED=1
 }
 
 ensure_feed_exists
+ITEM_ADDED=0
 add_item_to_feed
 
-echo "Added daily haiku for $TODAY_YMD to $FEED_PATH"
+if [[ "$ITEM_ADDED" -eq 1 ]]; then
+  echo "Added daily haiku for $TODAY_YMD to $FEED_PATH"
+else
+  echo "No new item added for $TODAY_YMD (already present)"
+fi
 
