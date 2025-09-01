@@ -195,7 +195,6 @@ ensure_feed_exists() {
 </rss>
 __FEED__
   sed -i "s/REPLACED_AT_RUNTIME/$RFC2822_NOW/g" "$FEED_PATH"
-  chmod +r $FEED_PATH
 }
 
 add_item_to_feed() {
@@ -240,6 +239,8 @@ add_item_to_feed() {
 ensure_feed_exists
 ITEM_ADDED=0
 add_item_to_feed
+
+chmod +r $FEED_PATH
 
 if [[ "$ITEM_ADDED" -eq 1 ]]; then
   echo "Added daily haiku for $TODAY_YMD to $FEED_PATH"
