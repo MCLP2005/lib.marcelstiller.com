@@ -177,6 +177,8 @@ fi
 AI_TEXT_TRIMMED=$(printf "%s" "$AI_TEXT" \
   | sed -e 's/\r//g' -e 's/\t\+//g' -e 's/]]>/]]]]><![CDATA[>/g')
 
+AI_TEXT_TRIMMED=$(printf "%s" "$AI_TEXT_TRIMMED" | sed ':a;N;$!ba;s/\n/<br>/g')
+
 ensure_feed_exists() {
   if [[ -f "$FEED_PATH" ]]; then
     return
