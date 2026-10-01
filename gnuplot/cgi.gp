@@ -44,3 +44,9 @@ set xrange [system("date -u -d '89 days ago' +'%F 00:00'"):system("date -u +'%F 
 plot "/data/cgi.csv" using 1:2 with lines lw 3 lc rgb "#008080" title "Easteregg", \
         "/data/cgi.csv" using 1:3 with lines lw 3 lc rgb "#00ff00" title "deathscreen", \
         "/data/cgi.csv" using 1:4 with lines lw 3 lc rgb "#0000ff" title "style"
+
+set out "/var/www/html/monitoring/graphics/local_all.svg"
+set xrange [:]
+plot "/data/cgi.csv" using 1:2 with lines lw 3 lc rgb "#008080" title "Easteregg", \
+        "/data/cgi.csv" using 1:3 with lines lw 3 lc rgb "#00ff00" title "deathscreen", \
+        "/data/cgi.csv" using 1:4 with lines lw 3 lc rgb "#0000ff" title "style"
