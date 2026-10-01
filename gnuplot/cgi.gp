@@ -1,8 +1,8 @@
 set terminal svg size 2000,1000 background '#eeeeee' enhanced font 'Verdana,18'
 set datafile separator ';'
-set title "Nutzung der Einzelnen CGI Skripte"
-set xlabel "Zeit"
-set ylabel "Anzahl an Aufrufen pro Minute"
+set title "CGI Requests hitting this Node"
+set xlabel "Time"
+set ylabel "Number of processed requests per minute"
 set xdata time
 set timefmt "%Y-%m-%d %H:%M"
 set xrange [system("date -u -d '13 days ago' +'%F 00:00'"):system("date -u +'%F 24:00'")]
