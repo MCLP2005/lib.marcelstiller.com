@@ -16,6 +16,7 @@ row=("$timestamp")
 for logfile in "${logfiles[@]}"; do
     if test -e $logdir/$logfile; then
         count=$(wc -l < "$logdir/$logfile")
+        count=$(echo "$count / 60" | bc -l)
     else
         count=0
     fi
