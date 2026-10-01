@@ -5,7 +5,7 @@ set xlabel "Time"
 set ylabel "Number of processed requests per minute"
 set xdata time
 set timefmt "%Y-%m-%d %H:%M"
-set xrange [system("date -u -d '13 days ago' +'%F 00:00'"):system("date -u +'%F 24:00'")]
+set xrange [system("date -u -d '20 days ago' +'%F 00:00'"):system("date -u +'%F 24:00'")]
 set format x "%Y-%m-%d %H:%M"
 set yrange [0:100]
 set tics textcolor "black"
