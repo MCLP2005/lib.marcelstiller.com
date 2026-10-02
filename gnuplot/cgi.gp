@@ -6,7 +6,8 @@ set ylabel "Number of processed requests per minute"
 set xdata time
 set timefmt "%Y-%m-%d %H:%M"
 set format x "%Y-%m-%d %H:%M"
-set yrange [0:100]
+set yrange [0:]
+set logscale y 10
 set tics textcolor "black"
 set xtics rotate by 90 right
 
